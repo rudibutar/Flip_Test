@@ -1,0 +1,657 @@
+{
+	"info": {
+		"_postman_id": "d3da22b0-1a71-4d7d-85af-1bdbc28028d9",
+		"name": "API AUTOMATION",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get_coordinates_by_location_name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Lat and Lon is succesfully set\", function(){",
+							"    var jsonData = pm.response.json();",
+							"",
+							"    pm.collectionVariables.set(\"lat\", jsonData[0].lat)",
+							"    pm.collectionVariables.set(\"lon\", jsonData[0].lon)",
+							"",
+							"    let latValueCollection = pm.collectionVariables.get(\"lat\");",
+							"    let lonValueCollection = pm.collectionVariables.get(\"lon\");",
+							"",
+							"    pm.expect(jsonData[0].lat).to.eql(latValueCollection);",
+							"    pm.expect(jsonData[0].lon).to.eql(lonValueCollection);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://api.openweathermap.org/geo/1.0/direct?q=Jakarta Selatan&limit=5&appid={{api_key}}",
+					"protocol": "http",
+					"host": [
+						"api",
+						"openweathermap",
+						"org"
+					],
+					"path": [
+						"geo",
+						"1.0",
+						"direct"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "Jakarta Selatan"
+						},
+						{
+							"key": "limit",
+							"value": "5"
+						},
+						{
+							"key": "appid",
+							"value": "{{api_key}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_5_day_weather_forecast",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const schema = {",
+							"",
+							"  \"type\": \"object\",",
+							"  \"properties\": {",
+							"    \"cod\": {",
+							"      \"type\": \"string\"",
+							"    },",
+							"    \"message\": {",
+							"      \"type\": \"integer\"",
+							"    },",
+							"    \"cnt\": {",
+							"      \"type\": \"integer\"",
+							"    },",
+							"    \"list\": {",
+							"      \"type\": \"array\",",
+							"      \"items\": [",
+							"        {",
+							"          \"type\": \"object\",",
+							"          \"properties\": {",
+							"            \"dt\": {",
+							"              \"type\": \"integer\"",
+							"            },",
+							"            \"main\": {",
+							"              \"type\": \"object\",",
+							"              \"properties\": {",
+							"                \"temp\": {",
+							"                  \"type\": \"number\"",
+							"                },",
+							"                \"feels_like\": {",
+							"                  \"type\": \"number\"",
+							"                },",
+							"                \"temp_min\": {",
+							"                  \"type\": \"number\"",
+							"                },",
+							"                \"temp_max\": {",
+							"                  \"type\": \"number\"",
+							"                },",
+							"                \"pressure\": {",
+							"                  \"type\": \"integer\"",
+							"                },",
+							"                \"sea_level\": {",
+							"                  \"type\": \"integer\"",
+							"                },",
+							"                \"grnd_level\": {",
+							"                  \"type\": \"integer\"",
+							"                },",
+							"                \"humidity\": {",
+							"                  \"type\": \"integer\"",
+							"                },",
+							"                \"temp_kf\": {",
+							"                  \"type\": \"number\"",
+							"                }",
+							"              },",
+							"              \"required\": [",
+							"                \"temp\",",
+							"                \"feels_like\",",
+							"                \"temp_min\",",
+							"                \"temp_max\",",
+							"                \"pressure\",",
+							"                \"sea_level\",",
+							"                \"grnd_level\",",
+							"                \"humidity\",",
+							"                \"temp_kf\"",
+							"              ]",
+							"            },",
+							"            \"weather\": {",
+							"              \"type\": \"array\",",
+							"              \"items\": [",
+							"                {",
+							"                  \"type\": \"object\",",
+							"                  \"properties\": {",
+							"                    \"id\": {",
+							"                      \"type\": \"integer\"",
+							"                    },",
+							"                    \"main\": {",
+							"                      \"type\": \"string\"",
+							"                    },",
+							"                    \"description\": {",
+							"                      \"type\": \"string\"",
+							"                    },",
+							"                    \"icon\": {",
+							"                      \"type\": \"string\"",
+							"                    }",
+							"                  },",
+							"                  \"required\": [",
+							"                    \"id\",",
+							"                    \"main\",",
+							"                    \"description\",",
+							"                    \"icon\"",
+							"                  ]",
+							"                }",
+							"              ]",
+							"            },",
+							"            \"clouds\": {",
+							"              \"type\": \"object\",",
+							"              \"properties\": {",
+							"                \"all\": {",
+							"                  \"type\": \"integer\"",
+							"                }",
+							"              },",
+							"              \"required\": [",
+							"                \"all\"",
+							"              ]",
+							"            },",
+							"            \"wind\": {",
+							"              \"type\": \"object\",",
+							"              \"properties\": {",
+							"                \"speed\": {",
+							"                  \"type\": \"number\"",
+							"                },",
+							"                \"deg\": {",
+							"                  \"type\": \"integer\"",
+							"                },",
+							"                \"gust\": {",
+							"                  \"type\": \"number\"",
+							"                }",
+							"              },",
+							"              \"required\": [",
+							"                \"speed\",",
+							"                \"deg\",",
+							"                \"gust\"",
+							"              ]",
+							"            },",
+							"            \"visibility\": {",
+							"              \"type\": \"integer\"",
+							"            },",
+							"            \"pop\": {",
+							"              \"type\": \"integer\"",
+							"            },",
+							"            \"sys\": {",
+							"              \"type\": \"object\",",
+							"              \"properties\": {",
+							"                \"pod\": {",
+							"                  \"type\": \"string\"",
+							"                }",
+							"              },",
+							"              \"required\": [",
+							"                \"pod\"",
+							"              ]",
+							"            },",
+							"            \"dt_txt\": {",
+							"              \"type\": \"string\"",
+							"            }",
+							"          },",
+							"          \"required\": [",
+							"            \"dt\",",
+							"            \"main\",",
+							"            \"weather\",",
+							"            \"clouds\",",
+							"            \"wind\",",
+							"            \"visibility\",",
+							"            \"pop\",",
+							"            \"sys\",",
+							"            \"dt_txt\"",
+							"          ]",
+							"        }",
+							"      ]",
+							"    },",
+							"    \"city\": {",
+							"      \"type\": \"object\",",
+							"      \"properties\": {",
+							"        \"id\": {",
+							"          \"type\": \"integer\"",
+							"        },",
+							"        \"name\": {",
+							"          \"type\": \"string\"",
+							"        },",
+							"        \"coord\": {",
+							"          \"type\": \"object\",",
+							"          \"properties\": {",
+							"            \"lat\": {",
+							"              \"type\": \"number\"",
+							"            },",
+							"            \"lon\": {",
+							"              \"type\": \"number\"",
+							"            }",
+							"          },",
+							"          \"required\": [",
+							"            \"lat\",",
+							"            \"lon\"",
+							"          ]",
+							"        },",
+							"        \"country\": {",
+							"          \"type\": \"string\"",
+							"        },",
+							"        \"population\": {",
+							"          \"type\": \"integer\"",
+							"        },",
+							"        \"timezone\": {",
+							"          \"type\": \"integer\"",
+							"        },",
+							"        \"sunrise\": {",
+							"          \"type\": \"integer\"",
+							"        },",
+							"        \"sunset\": {",
+							"          \"type\": \"integer\"",
+							"        }",
+							"      },",
+							"      \"required\": [",
+							"        \"id\",",
+							"        \"name\",",
+							"        \"coord\",",
+							"        \"country\",",
+							"        \"population\",",
+							"        \"timezone\",",
+							"        \"sunrise\",",
+							"        \"sunset\"",
+							"      ]",
+							"    }",
+							"  },",
+							"  \"required\": [",
+							"    \"cod\",",
+							"    \"message\",",
+							"    \"cnt\",",
+							"    \"list\",",
+							"    \"city\"",
+							"  ]",
+							"}",
+							"",
+							"pm.test(\"Validate schema\", () => {",
+							"            pm.response.to.have.jsonSchema(schema);",
+							"});",
+							"",
+							"var jsonData = pm.response.json();",
+							"",
+							"/*pm.test(\"Cod and cnt is successfully verified\", function(){",
+							"",
+							"    pm.expect(jsonData.cod).to.eql('200');",
+							"    pm.expect(jsonData.cnt).to.eql(40);",
+							"});*/",
+							"",
+							"pm.test(\"Another Important attribut already verified\", function(){",
+							"",
+							"    pm.collectionVariables.set(\"city_id\", jsonData.city.id)",
+							"    pm.collectionVariables.set(\"city_name\", jsonData.city.name)",
+							"    pm.collectionVariables.set(\"city_country\", jsonData.city.country)",
+							"",
+							"    let cityIdValueCollection = pm.collectionVariables.get(\"city_id\");",
+							"    let cityNameValueCollection = pm.collectionVariables.get(\"city_name\");",
+							"    let cityCountryValueCollection = pm.collectionVariables.get(\"city_country\");",
+							"",
+							"    let latValueCollection = pm.collectionVariables.get(\"lat\");",
+							"    let lonValueCollection = pm.collectionVariables.get(\"lon\");",
+							"",
+							"    pm.expect(jsonData.city.id).to.eql(cityIdValueCollection);",
+							"    pm.expect(jsonData.city.name).to.eql(cityNameValueCollection);",
+							"    pm.expect(jsonData.city.country).to.eql(cityCountryValueCollection);",
+							"    pm.expect(jsonData.city.coord.lat).greaterThan(latValueCollection);",
+							"    pm.expect(jsonData.city.coord.lon).greaterThan(lonValueCollection);",
+							"    pm.expect(jsonData.cod).to.eql('200');",
+							"    pm.expect(jsonData.cnt).to.eql(40);",
+							"});",
+							"",
+							"pm.test('Number of list returned = ' + jsonData.list.length, function () {",
+							"    pm.expect(jsonData.list.length).to.equal(jsonData.cnt);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "api.openweathermap.org/data/2.5/forecast?lat={{lat}}&lon={{lon}}&appid={{api_key}}",
+					"host": [
+						"api",
+						"openweathermap",
+						"org"
+					],
+					"path": [
+						"data",
+						"2.5",
+						"forecast"
+					],
+					"query": [
+						{
+							"key": "lat",
+							"value": "{{lat}}"
+						},
+						{
+							"key": "lon",
+							"value": "{{lon}}"
+						},
+						{
+							"key": "appid",
+							"value": "{{api_key}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_air_pollution",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const schema = {",
+							"  \"type\": \"object\",",
+							"  \"properties\": {",
+							"    \"coord\": {",
+							"      \"type\": \"object\",",
+							"      \"properties\": {",
+							"        \"lon\": {",
+							"          \"type\": \"number\"",
+							"        },",
+							"        \"lat\": {",
+							"          \"type\": \"number\"",
+							"        }",
+							"      },",
+							"      \"required\": [",
+							"        \"lon\",",
+							"        \"lat\"",
+							"      ]",
+							"    },",
+							"    \"list\": {",
+							"      \"type\": \"array\",",
+							"      \"items\": [",
+							"        {",
+							"          \"type\": \"object\",",
+							"          \"properties\": {",
+							"            \"main\": {",
+							"              \"type\": \"object\",",
+							"              \"properties\": {",
+							"                \"aqi\": {",
+							"                  \"type\": \"integer\"",
+							"                }",
+							"              },",
+							"              \"required\": [",
+							"                \"aqi\"",
+							"              ]",
+							"            },",
+							"            \"components\": {",
+							"              \"type\": \"object\",",
+							"              \"properties\": {",
+							"                \"co\": {",
+							"                  \"type\": \"number\"",
+							"                },",
+							"                \"no\": {",
+							"                  \"type\": \"number\"",
+							"                },",
+							"                \"no2\": {",
+							"                  \"type\": \"number\"",
+							"                },",
+							"                \"o3\": {",
+							"                  \"type\": \"number\"",
+							"                },",
+							"                \"so2\": {",
+							"                  \"type\": \"number\"",
+							"                },",
+							"                \"pm2_5\": {",
+							"                  \"type\": \"number\"",
+							"                },",
+							"                \"pm10\": {",
+							"                  \"type\": \"number\"",
+							"                },",
+							"                \"nh3\": {",
+							"                  \"type\": \"number\"",
+							"                }",
+							"              },",
+							"              \"required\": [",
+							"                \"co\",",
+							"                \"no\",",
+							"                \"no2\",",
+							"                \"o3\",",
+							"                \"so2\",",
+							"                \"pm2_5\",",
+							"                \"pm10\",",
+							"                \"nh3\"",
+							"              ]",
+							"            },",
+							"            \"dt\": {",
+							"              \"type\": \"integer\"",
+							"            }",
+							"          },",
+							"          \"required\": [",
+							"            \"main\",",
+							"            \"components\",",
+							"            \"dt\"",
+							"          ]",
+							"        }",
+							"      ]",
+							"    }",
+							"  },",
+							"  \"required\": [",
+							"    \"coord\",",
+							"    \"list\"",
+							"  ]",
+							"}",
+							"",
+							"pm.test(\"Validate schema\", () => {",
+							"            pm.response.to.have.jsonSchema(schema);",
+							"});",
+							"",
+							"var jsonData = pm.response.json();",
+							"",
+							" pm.test(\"Scale pollution is very poor!\", function(){",
+							"",
+							"     pm.collectionVariables.set(\"scale_pollution\", jsonData.list[0].main.aqi)",
+							"",
+							"    let scalePollutionValueCollection = pm.collectionVariables.get(\"scale_pollution\");",
+							"",
+							"    pm.expect(jsonData.list[0].main.aqi).to.eql(scalePollutionValueCollection);",
+							"",
+							"});",
+							"",
+							"pm.test(\"Another Important attribut already verified\", function(){",
+							"",
+							"    pm.collectionVariables.set(\"date_timestamp\", jsonData.list[0].dt)",
+							"    pm.collectionVariables.set(\"component_co\", jsonData.list[0].components.co)",
+							"    pm.collectionVariables.set(\"component_no\", jsonData.list[0].components.no)",
+							"    pm.collectionVariables.set(\"component_no2\", jsonData.list[0].components.no2)",
+							"    pm.collectionVariables.set(\"component_o3\", jsonData.list[0].components.o3)",
+							"    pm.collectionVariables.set(\"component_so2\", jsonData.list[0].components.so2)",
+							"    pm.collectionVariables.set(\"component_pm2_5\", jsonData.list[0].components.pm2_5)",
+							"    pm.collectionVariables.set(\"component_pm10\", jsonData.list[0].components.pm10)",
+							"    pm.collectionVariables.set(\"component_nh3\", jsonData.list[0].components.nh3)",
+							"",
+							"    let latValueCollection = pm.collectionVariables.get(\"lat\");",
+							"    let lonValueCollection = pm.collectionVariables.get(\"lon\");",
+							"    let dateTimeStampValueCollection = pm.collectionVariables.get(\"date_timestamp\");",
+							"    let compCoValueCollection = pm.collectionVariables.get(\"component_co\");",
+							"    let compNoValueCollection = pm.collectionVariables.get(\"component_no\");",
+							"    let compNo2ValueCollection = pm.collectionVariables.get(\"component_no2\");",
+							"    let compO3ValueCollection = pm.collectionVariables.get(\"component_o3\");",
+							"    let compSo2ValueCollection = pm.collectionVariables.get(\"component_so2\");",
+							"    let compPm2_5ValueCollection = pm.collectionVariables.get(\"component_pm2_5\");",
+							"    let compPm10ValueCollection = pm.collectionVariables.get(\"component_pm10\");",
+							"    let compNh3ValueCollection = pm.collectionVariables.get(\"component_nh3\");",
+							"",
+							"    pm.expect(jsonData.coord.lat).greaterThan(latValueCollection);",
+							"    pm.expect(jsonData.coord.lon).greaterThan(lonValueCollection);",
+							"    pm.expect(jsonData.list[0].dt).to.eql(dateTimeStampValueCollection);",
+							"    pm.expect(jsonData.list[0].components.co).to.eql(compCoValueCollection);",
+							"    pm.expect(jsonData.list[0].components.no).to.eql(compNoValueCollection);",
+							"    pm.expect(jsonData.list[0].components.no2).to.eql(compNo2ValueCollection);",
+							"    pm.expect(jsonData.list[0].components.o3).to.eql(compO3ValueCollection);",
+							"    pm.expect(jsonData.list[0].components.so2).to.eql(compSo2ValueCollection);",
+							"    pm.expect(jsonData.list[0].components.pm2_5).to.eql(compPm2_5ValueCollection);",
+							"    pm.expect(jsonData.list[0].components.pm10).to.eql(compPm10ValueCollection);",
+							"    pm.expect(jsonData.list[0].components.nh3).to.eql(compNh3ValueCollection);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://api.openweathermap.org/data/2.5/air_pollution?lat={{lat}}&lon={{lon}}&appid={{api_key}}",
+					"protocol": "http",
+					"host": [
+						"api",
+						"openweathermap",
+						"org"
+					],
+					"path": [
+						"data",
+						"2.5",
+						"air_pollution"
+					],
+					"query": [
+						{
+							"key": "lat",
+							"value": "{{lat}}"
+						},
+						{
+							"key": "lon",
+							"value": "{{lon}}"
+						},
+						{
+							"key": "appid",
+							"value": "{{api_key}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "api_key",
+			"value": "baf6a986d17c5ba3956c7ce6023c3740"
+		},
+		{
+			"key": "lat",
+			"value": ""
+		},
+		{
+			"key": "lon",
+			"value": ""
+		},
+		{
+			"key": "city_id",
+			"value": ""
+		},
+		{
+			"key": "city_name",
+			"value": ""
+		},
+		{
+			"key": "city_country",
+			"value": ""
+		},
+		{
+			"key": "date_timestamp",
+			"value": ""
+		},
+		{
+			"key": "scale_pollution",
+			"value": ""
+		},
+		{
+			"key": "component_co",
+			"value": ""
+		},
+		{
+			"key": "component_no",
+			"value": ""
+		},
+		{
+			"key": "component_no2",
+			"value": ""
+		},
+		{
+			"key": "component_o3",
+			"value": ""
+		},
+		{
+			"key": "component_so2",
+			"value": ""
+		},
+		{
+			"key": "component_pm2_5",
+			"value": ""
+		},
+		{
+			"key": "component_pm10",
+			"value": ""
+		},
+		{
+			"key": "component_nh3",
+			"value": ""
+		}
+	]
+}
